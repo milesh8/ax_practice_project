@@ -96,7 +96,7 @@ router.get('/get', function (req, res) {
 
 //get main page html
 router.get('/', function(req, res) {
-   res.sendFile(path.join(__dirname, '../ax_practice_test/views', 'index.html'))
+   res.sendFile(path.join(__dirname, '../views', 'index.html'))
 });
 
 module.exports = router;
