@@ -3,13 +3,23 @@ var pg = require('pg');
 var path = require('path');
 var validate = require('jsonschema').validate;
 var moment = require('moment-timezone');
+var request = require('request');
 
 var router = express.Router();
 
-//example json object array
-var json_ex = [
+var sample_url = "https://jsonplaceholder.typicode.com/posts";
 
-];
+//example json object array
+var json_ex;
+
+request({
+    url: sample_url,
+    json: true
+}, function(err, resp, body) {
+    json_ex = body;
+});
+
+
 
 //schema to validate
 var schema = {
@@ -30,6 +40,17 @@ var schema = {
     }
 };
 
+var practice_schema ={
+    "id": "/simpleSample",
+    "type": "object",
+    "properties": {
+        "userId": {"type": "integer"},
+        "id": {"type": "integer"},
+        "title": {"type": "string"},
+        "body": {"type": "string"}
+    }
+};
+
 //insert json into database
 function insert_json(json) {
     //get date
@@ -42,6 +63,23 @@ function insert_json(json) {
 
     //insert the date and json into the table
     pool.query("INSERT INTO scribes (ts, data) VALUES('" + d + "', '" + JSON.stringify(json) + "');", function (err, res) {
+        console.log(err, res);
+        pool.end();
+    });
+}
+
+//insert practice json into database
+function insert_sample_json(json) {
+    //get date
+    var local = 'America/Los_Angeles';
+    var d = moment(new Date());
+    d = d.tz(local).format('YYYY-MM-DD HH:mm:ss');
+
+    //connect to database
+    var pool = connect_db();
+
+    //insert the date and json into the table
+    pool.query("INSERT INTO practice (ts, data) VALUES('" + d + "', '" + JSON.stringify(json) + "');", function (err, res) {
         console.log(err, res);
         pool.end();
     });
@@ -68,6 +106,29 @@ router.post('/add', function(req, res) {
         if (validator.errors.length === 0) {
             //insert json into postgres db
             insert_json(json_ex[i]);
+            success = true;
+        }
+        else {
+            for (var err_msg_index = 0; i < validator.length; ++err_msg_index) {
+                console.log(validator[err_msg_index]);
+            }
+            success = false;
+        }
+    }
+    if (success) {
+        res.send("Successful Insert")
+    }
+
+});
+
+//insert sample data
+router.post('/add_sample', function(req, res) {
+    var success = false;
+    for (var i = 0; i < json_ex.length; ++i) {
+        var validator = validate((json_ex[i]), practice_schema);
+        if (validator.errors.length === 0) {
+            //insert json into postgres db
+            insert_sample_json(json_ex[i]);
             success = true;
         }
         else {
