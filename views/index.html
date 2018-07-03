@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Post</title>
+    <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#sendToDB").click(function () {
+                $.post("http://localhost:8080/scribes/add");
+            });
+
+            $("#submit_query").click(function () {
+                var url = "http://localhost:8080/scribes/get?query=" + encodeURIComponent(String($("#query").val()));
+                $.get(url);
+                window.location.href = url;
+            })
+        })
+
+    </script>
+</head>
+<body>
+    <input type = "button" id = "sendToDB" value = "Send to DB">
+    <br>
+    <form>
+        Query: <input type="text" id = "query" value = "Query...">
+        <br>
+        <input type = "button" id = "submit_query" value = "Submit Query">
+    </form>
+</body>
+</html>
