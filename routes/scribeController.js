@@ -11,7 +11,8 @@ var router = express.Router();
 var sample_url = "https://jsonplaceholder.typicode.com/posts";
 
 //example json object array
-var json_ex;
+var json_ex = [];
+
 
 request({
     url: sample_url,
@@ -37,19 +38,21 @@ var schema = {
         "user_type": {"type": "string"},
         "doctor_name": {"type": "string"},
         "doctor_email": {"type": "string"}
-    }
+    },
+    "required": ["scribe_id", "scribe_name", "scribe_email", "partner_time", "login_time", "browser", "join_time", "last_activity", "user_type", "doctor_name", "doctor_email"]
 };
 
 //schema to validate practice data
 var practice_schema ={
-    "id": "/simpleSample",
+    "id": "/simpleSampleData",
     "type": "object",
     "properties": {
         "userId": {"type": "integer"},
         "id": {"type": "integer"},
         "title": {"type": "string"},
         "body": {"type": "string"}
-    }
+    },
+    "required": ["userId", "id", "title", "body"]
 };
 
 //insert json into database
@@ -89,18 +92,42 @@ function connect_db() {
     return pool;
 }
 
+router.post('/', function(req, res) {
+    var user_json = JSON.parse("[" + req.body.user_json + "]");
+
+    var success = false;
+    for (var json_index = 0; json_index < user_json.length; ++json_index) {
+        var validator = validate(user_json[json_index], practice_schema);
+
+        if (validator.valid) {
+            insert_sample_json(user_json[json_index]);
+            success = true;
+        }
+        else {
+            for (var err_msg_index = 0; err_msg_index < validator.length; ++err_msg_index) {
+                console.log(validator[err_msg_index]);
+            }
+            success = false;
+        }
+    }
+    if (success)
+        res.render(path.join(__dirname, '../views', 'user_input_success.html'));
+    else
+        res.render(path.join(__dirname, '../views', 'user_input_fail.html'));
+});
+
 //validate json and insert
 router.post('/add', function(req, res) {
     var success = false;
     for (var i = 0; i < json_ex.length; ++i) {
         var validator = validate((json_ex[i]), schema);
-        if (validator.errors.length === 0) {
+        if (validator.valid) {
             //insert json into postgres db
             insert_json(json_ex[i]);
             success = true;
         }
         else {
-            for (var err_msg_index = 0; i < validator.length; ++err_msg_index) {
+            for (var err_msg_index = 0; err_msg_index < validator.length; ++err_msg_index) {
                 console.log(validator[err_msg_index]);
             }
             success = false;
@@ -117,13 +144,13 @@ router.post('/add_sample', function(req, res) {
     var success = false;
     for (var i = 0; i < json_ex.length; ++i) {
         var validator = validate((json_ex[i]), practice_schema);
-        if (validator.errors.length === 0) {
+        if (validator.valid) {
             //insert json into postgres db
             insert_sample_json(json_ex[i]);
             success = true;
         }
         else {
-            for (var err_msg_index = 0; i < validator.length; ++err_msg_index) {
+            for (var err_msg_index = 0; err_msg_index < validator.length; ++err_msg_index) {
                 console.log(validator[err_msg_index]);
             }
             success = false;

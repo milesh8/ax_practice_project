@@ -5,27 +5,36 @@
     <title>Simple Post</title>
     <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>
+        function
         $(document).ready(function() {
-            $("#sendToDB").click(function () {
-                $.post("http://localhost:8080/scribes/add");
-            });
-
             $("#submit_query").click(function () {
                 var url = "http://localhost:8080/scribes/get?query=" + encodeURIComponent(String($("#query").val()));
                 $.get(url);
                 window.location.href = url;
-            })
+            });
+            $("#sendToDB").click(function () {
+                $.post("http://localhost:8080/scribes/add_sample")
+            });
         })
 
     </script>
 </head>
 <body>
-    <input type = "button" id = "sendToDB" value = "Send to DB">
+    <input type="button" id="sendToDB" value="Website -> DB">
+    <form action="http://localhost:8080/scribes" method="post" onsubmit="">
+        JSON input: <input type="text" id ="user_json" name="user_json">
+        <br>
+        <input type = "submit" id = "submit" value = "Submit">
+    </form>
+
     <br>
     <form>
         Query: <input type="text" id = "query" value = "Query...">
         <br>
         <input type = "button" id = "submit_query" value = "Submit Query">
+
     </form>
+
+
 </body>
 </html>
