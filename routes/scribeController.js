@@ -7,6 +7,7 @@ var request = require('request');
 
 var router = express.Router();
 
+//can use VIZOR url as well.
 var sample_url = "https://jsonplaceholder.typicode.com/posts";
 
 //example json object array
@@ -18,7 +19,6 @@ request({
 }, function(err, resp, body) {
     json_ex = body;
 });
-
 
 
 //schema to validate
@@ -40,6 +40,7 @@ var schema = {
     }
 };
 
+//schema to validate practice data
 var practice_schema ={
     "id": "/simpleSample",
     "type": "object",
@@ -53,16 +54,11 @@ var practice_schema ={
 
 //insert json into database
 function insert_json(json) {
-    //get date
-    var local = 'America/Los_Angeles';
-    var d = moment(new Date());
-    d = d.tz(local).format('YYYY-MM-DD HH:mm:ss');
-
     //connect to database
     var pool = connect_db();
 
     //insert the date and json into the table
-    pool.query("INSERT INTO scribes (ts, data) VALUES('" + d + "', '" + JSON.stringify(json) + "');", function (err, res) {
+    pool.query("INSERT INTO scribes (ts, data) VALUES(current_timestamp, '" + JSON.stringify(json) + "');", function (err, res) {
         console.log(err, res);
         pool.end();
     });
@@ -70,16 +66,11 @@ function insert_json(json) {
 
 //insert practice json into database
 function insert_sample_json(json) {
-    //get date
-    var local = 'America/Los_Angeles';
-    var d = moment(new Date());
-    d = d.tz(local).format('YYYY-MM-DD HH:mm:ss');
-
     //connect to database
     var pool = connect_db();
 
     //insert the date and json into the table
-    pool.query("INSERT INTO practice (ts, data) VALUES('" + d + "', '" + JSON.stringify(json) + "');", function (err, res) {
+    pool.query("INSERT INTO practice (ts, data) VALUES(current_timestamp, '" + JSON.stringify(json) + "');", function (err, res) {
         console.log(err, res);
         pool.end();
     });
