@@ -5,7 +5,6 @@
     <title>Simple Post</title>
     <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>
-        function
         $(document).ready(function() {
             $("#submit_query").click(function () {
                 var url = "http://localhost:8080/scribes/get?query=" + encodeURIComponent(String($("#query").val()));
@@ -16,7 +15,6 @@
                 $.post("http://localhost:8080/scribes/add_sample")
             });
         })
-
     </script>
 </head>
 <body>
